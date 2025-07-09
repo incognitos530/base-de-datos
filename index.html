@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventario con Login y Registro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fa;
+      padding: 40px;
+      margin: 0;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    /* Contenedores para login y registro */
+    .hidden {
+      display: none;
+    }
+
+    #login-container, #registro-container {
+      background-color: #fff;
+      padding: 25px 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 0 auto 40px;
+    }
+
+    form {
+      display: grid;
+      gap: 15px;
+    }
+
+    form input, form button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    form button {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    form button:hover {
+      background-color: #1c5f8a;
+    }
+
+    #registro-link, #login-link {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: #2980b9;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+    #registro-link:hover, #login-link:hover {
+      color: #1c5f8a;
+    }
+
+    /* Estilos inventario y demás (igual que antes) */
+    form#formulario {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto 30px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    form#formulario select, form#formulario input, form#formulario button {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    form#formulario button {
+      grid-column: span 2;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    form#formulario button:hover {
+      background-color: #1c5f8a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+
+    thead {
+      background-color: #34495e;
+      color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tfoot td {
+      font-weight: bold;
+      background-color: #ecf0f1;
+    }
+
+    .btn-vender {
+      padding: 6px 10px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-right: 6px;
+    }
+    .btn-vender:hover {
+      background-color: #1e8449;
+    }
+
+    .btn-eliminar {
+      padding: 5px 10px;
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-eliminar:hover {
+      background-color: #992d22;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #7f8c8d;
+    }
+
+    .exportar {
+      display: block;
+      margin: 20px auto;
+      background-color: #8e44ad;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .exportar:hover {
+      background-color: #6f3480;
+    }
+
+    #resumen-ventas {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      font-size: 16px;
+      color: #34495e;
+      list-style: none;
+    }
+    #resumen-ventas li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    #resumen-ventas li:last-child {
+      border-bottom: none;
+    }
+
+    /* Botón logout */
+    #logout-btn {
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 150px;
+      font-size: 16px;
+    }
+    #logout-btn:hover {
+      background-color: #992d22;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Inventario de Alimentos Congelados</h1>
+
+  <!-- LOGIN -->
+  <div id="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form id="form-login">
+      <input type="text" id="login-username" placeholder="Usuario" required />
+      <input type="password" id="login-password" placeholder="Contraseña" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="registro-link">¿No tienes cuenta? Regístrate</div>
+  </div>
+
+  <!-- REGISTRO -->
+  <div id="registro-container" class="hidden">
+    <h2>Registro de Usuario</h2>
+    <form id="form-registro">
+      <input type="text" id="registro-username" placeholder="Usuario" required />
+      <input type="password" id="registro-password" placeholder="Contraseña" required />
+      <input type="password" id="registro-password-confirm" placeholder="Confirmar Contraseña" required />
+      <button type="submit">Registrarse</button>
+    </form>
+    <div id="login-link" class="hidden">¿Ya tienes cuenta? Inicia sesión</div>
+  </div>
+
+  <!-- APLICACION (INVENTARIO + MOVIMIENTOS) -->
+  <div id="app-container" class="hidden">
+
+    <button id="logout-btn">Cerrar Sesión</button>
+
+    <form id="formulario">
+      <select id="categoria" required>
+        <option value="">Seleccione Categoria</option>
+        <option value="Panaderia">Panaderia</option>
+        <option value="Fritura">Fritura</option>
+        <option value="Snacks">Snacks</option>
+      </select>
+
+      <select id="producto" required>
+        <option value="">Seleccione Producto</option>
+      </select>
+
+      <input type="text" id="lote" placeholder="Lote del producto" required />
+      <input type="number" id="almacen" placeholder="Cantidad en almacenamiento" min="0" required />
+      <input type="number" id="restante" placeholder="Cantidad restante" min="0" required />
+      <button type="submit">Agregar Producto</button>
+    </form>
+
+    <button class="exportar" onclick="exportarExcel()">Exportar a Excel</button>
+
+    <h2>Inventario Actual</h2>
+    <table id="inventario">
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Producto</th>
+          <th>Lote</th>
+          <th>Almacenado</th>
+          <th>Restante</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">Totales</td>
+          <td id="totalAlmacen">0</td>
+          <td id="totalRestante">0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h2>Movimientos de Ventas</h2>
+    <table id="movimientos">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Categoria</th>
+          <th>Producto</th>
+          <th>Lote</th>
+          <th>Cantidad Vendida</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Resumen Mensual de Ventas</h2>
+    <ul id="resumen-ventas">
+      <!-- Aquí va el resumen dinámico -->
+    </ul>
+
+    <div class="footer">Sistema de Inventario | Empresa de Alimentos Congelados © 2025</div>
+  </div>
+
+  <!-- SheetJS para exportar a Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    const LS_USUARIOS = "usuarios";
+    const LS_USUARIO_ACTUAL = "usuarioActual";
+
+    const productosPorCategoria = {
+      Panaderia: [
+        "Deditos de Queso",
+        "Deditos de Bocadillo",
+        "Empanada de Queso",
+        "Empanada de Jamon",
+        "Empanada Hawaiana"
+      ],
+      Fritura: [
+        "Megapatacon",
+        "Super Mega Patacon",
+        "Patacones Medianos",
+        "Canasticas",
+        "X40",
+        "Porthos",
+        "Varaderos"
+      ],
+      Snacks: [
+        "Chips de Yuca",
+        "Chicharron Crocante",
+        "Platanitos",
+        "Maiz Tostado"
+      ]
+    };
+
+    // Elementos del DOM
+    const categoriaSelect = document.getElementById("categoria");
+    const productoSelect = document.getElementById("producto");
+    const formulario = document.getElementById("formulario");
+    const inventarioTbody = document.querySelector("#inventario tbody");
+    const movimientosTbody = document.querySelector("#movimientos tbody");
+    const totalAlmacenEl = document.getElementById("totalAlmacen");
+    const totalRestanteEl = document.getElementById("totalRestante");
+    const resumenVentasEl = document.getElementById("resumen-ventas");
+
+    // Login y registro elementos
+    const loginContainer = document.getElementById("login-container");
+    const registroContainer = document.getElementById("registro-container");
+    const appContainer = document.getElementById("app-container");
+
+    const formLogin = document.getElementById("form-login");
+    const formRegistro = document.getElementById("form-registro");
+
+    const registroLink = document.getElementById("registro-link");
+    const loginLink = document.getElementById("login-link");
+
+    const logoutBtn = document.getElementById("logout-btn");
+
+    // Datos almacenados
+    let inventario = [];
+    let movimientos = [];
+    let usuarios = [];
+    let usuarioActual = null;
+
+    // --- FUNCIONES LOGIN/REGISTRO ---
+
+    function cargarUsuarios() {
+      usuarios = JSON.parse(localStorage.getItem(LS_USUARIOS)) || [];
+      usuarioActual = JSON.parse(localStorage.getItem(LS_USUARIO_ACTUAL)) || null;
+    }
+
+    function guardarUsuarios() {
+      localStorage.setItem(LS_USUARIOS, JSON.stringify(usuarios));
+      localStorage.setItem(LS_USUARIO_ACTUAL, JSON.stringify(usuarioActual));
+    }
+
+    // Cargar inventario y movimientos (se guardan por separado)
+    function guardarDatos() {
+      localStorage.setItem("inventario", JSON.stringify(inventario));
+      localStorage.setItem("movimientos", JSON.stringify(movimientos));
+    }
+
+    function cargarDatos() {
+      const inventarioLS = localStorage.getItem("inventario");
+      const movimientosLS = localStorage.getItem("movimientos");
+      inventario = inventarioLS ? JSON.parse(inventarioLS) : [];
+      movimientos = movimientosLS ? JSON.parse(movimientosLS) : [];
+    }
+
+    // Manejar mostrar/ocultar formularios login/registro
+    registroLink.addEventListener("click", () => {
+      loginContainer.classList.add("hidden");
+      registroContainer.classList.remove("hidden");
+      loginLink.classList.remove("hidden");
+      registroLink.classList.add("hidden");
+    });
+
+    loginLink.addEventListener("click", () => {
+      loginContainer.classList.remove("hidden");
+      registroContainer.classList.add("hidden");
+      loginLink.classList.add("hidden");
+      registroLink.classList.remove("hidden");
+    });
+
+    // Registro
+    formRegistro.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const username = document.getElementById("registro-username").value.trim();
+      const password = document.getElementById("registro-password").value;
+      const passwordConfirm = document.getElementById("registro-password-confirm").value;
+
+      if (!username || !password || !passwordConfirm) {
+        alert("Completa todos los campos.");
+        return;
+      }
+      if (password !== passwordConfirm) {
+        alert("Las contraseñas no coinciden.");
+        return;
+      }
+      if (usuarios.some(u => u.username === username)) {
+        alert("El usuario ya existe.");
+        return;
+      }
+
+      usuarios.push({ username, password });
+      guardarUsuarios();
+      alert("Usuario registrado. Ahora puedes iniciar sesión.");
+      formRegistro.reset();
+      registroContainer.classList.add("hidden");
+      loginContainer.classList.remove("hidden");
+      registroLink.classList.remove("hidden");
+      loginLink.classList.add("hidden");
+    });
+
+    // Login
+    formLogin.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const username = document.getElementById("login-username").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      const user = usuarios.find(u => u.username === username && u.password === password);
+
+      if (!user) {
+        alert("Usuario o contraseña incorrectos.");
+        return;
+      }
+
+      usuarioActual = user;
+      guardarUsuarios();
+
+      loginContainer.classList.add("hidden");
+      registroContainer.classList.add("hidden");
+      appContainer.classList.remove("hidden");
+
+      cargarDatos();
+      renderInventario();
+      renderMovimientos();
+      actualizarResumenVentas();
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", () => {
+      usuarioActual = null;
+      guardarUsuarios();
+
+      // Limpiar datos y UI
+      inventario = [];
+      movimientos = [];
+      guardarDatos();
+
+      appContainer.classList.add("hidden");
+      loginContainer.classList.remove("hidden");
+      registroLink.classList.remove("hidden");
+      loginLink.classList.add("hidden");
+    });
+
+    // --- INVENTARIO ---
+
+    // Cambiar productos según categoria
+    categoriaSelect.addEventListener("change", () => {
+      const cat = categoriaSelect.value;
+      productoSelect.innerHTML = '<option value="">Seleccione Producto</option>';
+      if (productosPorCategoria[cat]) {
+        productosPorCategoria[cat].forEach(p => {
+          const option = document.createElement("option");
+          option.value = p;
+          option.textContent = p;
+          productoSelect.appendChild(option);
+        });
+      }
+    });
+
+    formulario.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const categoria = categoriaSelect.value;
+      const producto = productoSelect.value;
+      const lote = document.getElementById("lote").value.trim();
+      const almacen = parseInt(document.getElementById("almacen").value);
+      const restante = parseInt(document.getElementById("restante").value);
+
+      if (!categoria || !producto || !lote || isNaN(almacen) || isNaN(restante)) {
+        alert("Completa todos los campos correctamente.");
+        return;
+      }
+      if (restante > almacen) {
+        alert("La cantidad restante no puede ser mayor que la almacenada.");
+        return;
+      }
+
+      // Verificar si ya existe producto + lote
+      const index = inventario.findIndex(item => 
+        item.categoria === categoria && item.producto === producto && item.lote === lote
+      );
+
+      if (index >= 0) {
+        // Actualizar cantidades
+        inventario[index].almacen += almacen;
+        inventario[index].restante += restante;
+      } else {
+        inventario.push({ categoria, producto, lote, almacen, restante });
+      }
+
+      guardarDatos();
+      renderInventario();
+      formulario.reset();
+      productoSelect.innerHTML = '<option value="">Seleccione Producto</option>';
+    });
+
+    function renderInventario() {
+      inventarioTbody.innerHTML = "";
+      let totalAlmacen = 0;
+      let totalRestante = 0;
+
+      inventario.forEach((item, i) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${item.categoria}</td>
+          <td>${item.producto}</td>
+          <td>${item.lote}</td>
+          <td>${item.almacen}</td>
+          <td>${item.restante}</td>
+          <td>
+            <button class="btn-vender" onclick="venderProducto(${i})">Vender</button>
+            <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+          </td>
+        `;
+
+        inventarioTbody.appendChild(tr);
+        totalAlmacen += item.almacen;
+        totalRestante += item.restante;
+      });
+
+      totalAlmacenEl.textContent = totalAlmacen;
+      totalRestanteEl.textContent = totalRestante;
+    }
+
+    // --- VENTAS (MOVIMIENTOS) ---
+
+    function venderProducto(index) {
+      const cantidad = prompt("Ingrese cantidad a vender:");
+      const cantVendida = parseInt(cantidad);
+
+      if (!cantidad || isNaN(cantVendida) || cantVendida <= 0) {
+        alert("Cantidad inválida.");
+        return;
+      }
+
+      if (cantVendida > inventario[index].restante) {
+        alert("No hay suficiente cantidad restante para vender.");
+        return;
+      }
+
+      // Actualizar inventario
+      inventario[index].restante -= cantVendida;
+
+      // Registrar movimiento
+      const movimiento = {
+        fecha: new Date().toISOString().slice(0, 10),
+        categoria: inventario[index].categoria,
+        producto: inventario[index].producto,
+        lote: inventario[index].lote,
+        cantidadVendida: cantVendida
+      };
+
+      movimientos.push(movimiento);
+
+      guardarDatos();
+      renderInventario();
+      renderMovimientos();
+      actualizarResumenVentas();
+    }
+
+    function eliminarProducto(index) {
+      if (!confirm("¿Está seguro de eliminar este producto?")) return;
+      inventario.splice(index, 1);
+      guardarDatos();
+      renderInventario();
+    }
+
+    function renderMovimientos() {
+      movimientosTbody.innerHTML = "";
+
+      movimientos.forEach((mov, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${mov.fecha}</td>
+          <td>${mov.categoria}</td>
+          <td>${mov.producto}</td>
+          <td>${mov.lote}</td>
+          <td>${mov.cantidadVendida}</td>
+          <td><button class="btn-eliminar" onclick="eliminarMovimiento(${i})">Eliminar</button></td>
+        `;
+        movimientosTbody.appendChild(tr);
+      });
+    }
+
+    function eliminarMovimiento(index) {
+      if (!confirm("¿Eliminar este movimiento?")) return;
+      movimientos.splice(index, 1);
+      guardarDatos();
+      renderMovimientos();
+      actualizarResumenVentas();
+    }
+
+    // --- RESUMEN MENSUAL DE VENTAS ---
+
+    function actualizarResumenVentas() {
+      // Obtener año y mes actual
+      const hoy = new Date();
+      const mesActual = hoy.getMonth() + 1; // enero=0
+      const anioActual = hoy.getFullYear();
+
+      // Filtrar movimientos del mes actual
+      const ventasMes = movimientos.filter(mov => {
+        const fecha = new Date(mov.fecha);
+        return fecha.getMonth() + 1 === mesActual && fecha.getFullYear() === anioActual;
+      });
+
+      // Agrupar por producto y sumar cantidades
+      const resumen = {};
+
+      ventasMes.forEach(v => {
+        const clave = `${v.categoria} - ${v.producto}`;
+        if (!resumen[clave]) {
+          resumen[clave] = 0;
+        }
+        resumen[clave] += v.cantidadVendida;
+      });
+
+      // Mostrar resumen
+      resumenVentasEl.innerHTML = "";
+
+      if (Object.keys(resumen).length === 0) {
+        resumenVentasEl.innerHTML = "<li>No hay ventas registradas este mes.</li>";
+        return;
+      }
+
+      for (const clave in resumen) {
+        const li = document.createElement("li");
+        li.textContent = `${clave}: ${resumen[clave]} unidades vendidas.`;
+        resumenVentasEl.appendChild(li);
+      }
+    }
+
+    // --- EXPORTAR A EXCEL ---
+
+    function exportarExcel() {
+      /* Crear un libro y hoja */
+      const wb = XLSX.utils.book_new();
+
+      // Inventario - convertir tabla a hoja
+      const tablaInventario = document.getElementById("inventario");
+      const wsInventario = XLSX.utils.table_to_sheet(tablaInventario);
+      XLSX.utils.book_append_sheet(wb, wsInventario, "Inventario");
+
+      // Movimientos - tabla a hoja
+      const tablaMovimientos = document.getElementById("movimientos");
+      const wsMovimientos = XLSX.utils.table_to_sheet(tablaMovimientos);
+      XLSX.utils.book_append_sheet(wb, wsMovimientos, "Movimientos");
+
+      XLSX.writeFile(wb, "Inventario_Movimientos.xlsx");
+    }
+
+    // --- INICIALIZACIÓN ---
+
+    window.onload = () => {
+      cargarUsuarios();
+
+      if (usuarioActual) {
+        loginContainer.classList.add("hidden");
+        registroContainer.classList.add("hidden");
+        appContainer.classList.remove("hidden");
+        cargarDatos();
+        renderInventario();
+        renderMovimientos();
+        actualizarResumenVentas();
+      } else {
+        loginContainer.classList.remove("hidden");
+        registroContainer.classList.add("hidden");
+        appContainer.classList.add("hidden");
+        registroLink.classList.remove("hidden");
+        loginLink.classList.add("hidden");
+      }
+    };
+
+    // Para que las funciones estén globales y se puedan usar en onclick
+    window.venderProducto = venderProducto;
+    window.eliminarProducto = eliminarProducto;
+    window.eliminarMovimiento = eliminarMovimiento;
+    window.exportarExcel = exportarExcel;
+
+  </script>
+</body>
+</html>
